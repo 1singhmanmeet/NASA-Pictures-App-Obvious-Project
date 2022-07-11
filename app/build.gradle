@@ -21,7 +21,12 @@ android {
     }
 
     buildTypes {
+        debug{
+            buildConfigField "String", "API_BASE", '"https://1singhmanmeet.github.io/"'
+        }
+
         release {
+            buildConfigField "String", "API_BASE", '"https://1singhmanmeet.github.io/"'
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -72,7 +77,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
 
     // Annotation processor
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    //kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
     // alternately - if using Java8, use the following instead of lifecycle-compiler
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
@@ -80,6 +85,10 @@ dependencies {
     def glideVersion="4.13.2"
     implementation "com.github.bumptech.glide:glide:$glideVersion"
     annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
-    implementation 'com.google.code.gson:gson:2.3.1'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    def okhttpVersion = '4.9.0'
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
     implementation "androidx.viewpager2:viewpager2:1.0.0"
 }
