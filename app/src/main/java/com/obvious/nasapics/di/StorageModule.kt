@@ -18,6 +18,7 @@ class StorageModule {
     fun providesRoomDB(@ApplicationContext context: Context)=
         Room.databaseBuilder(context,
             AppDatabase::class.java, "app_db")
+            .fallbackToDestructiveMigration()
             .build()
 
     @Provides

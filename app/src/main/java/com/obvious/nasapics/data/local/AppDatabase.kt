@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.obvious.nasapics.data.models.ImageResult
 
 
-@Database(entities = [ImageResult::class], version = 1, exportSchema = false)
+@Database(entities = [ImageResult::class], version = 2, exportSchema = false)
 abstract class AppDatabase:RoomDatabase() {
     abstract fun imageResultDao():ImageResultDao
 }

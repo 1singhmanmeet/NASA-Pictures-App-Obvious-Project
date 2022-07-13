@@ -18,19 +18,18 @@ import com.squareup.picasso.Target
 import com.squareup.picasso.Transformation
 import java.lang.Exception
 
-class ImageGridRecyclerAdapter() :
+class ImageGridRecyclerAdapter(val click: (ImageResult, Int) -> Unit) :
     ListAdapter<ImageResult,
-        ImageGridRecyclerAdapter.ImageGridViewHolder>(ImageGridDiff()) {
+            ImageGridRecyclerAdapter.ImageGridViewHolder>(ImageGridDiff()) {
+    class ImageGridViewHolder(
+        val binding: ImageGridViewHolderBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-    class ImageGridViewHolder(private val binding: ImageGridViewHolderBinding
-    ):RecyclerView.ViewHolder(binding.root){
-
-
-        fun bind(imageResult: ImageResult){
+        fun bind(imageResult: ImageResult) {
             Picasso.get().load(imageResult.url)
-                .into(object:Target{
+                .into(object : Target {
                     override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                        val height=bitmap?.height
+                        val height = bitmap?.height
                         setHeight(height!!)
                         binding.image.setImageBitmap(bitmap)
                     }
@@ -43,11 +42,11 @@ class ImageGridRecyclerAdapter() :
 
                     }
 
-                    fun setHeight(height:Int){
-                        val layoutParams=binding.image.layoutParams
+                    fun setHeight(height: Int) {
+                        val layoutParams = binding.image.layoutParams
                                 as ConstraintLayout.LayoutParams
-                        layoutParams.height=height
-                        binding.image.layoutParams=layoutParams
+                        layoutParams.height = height
+                        binding.image.layoutParams = layoutParams
                         binding.image.requestLayout()
                     }
 
@@ -56,31 +55,33 @@ class ImageGridRecyclerAdapter() :
 
     }
 
-    override fun onViewRecycled(holder: ImageGridViewHolder) {
-        super.onViewRecycled(holder)
-        Log.e("imageAdapter","image Recycled")
-    }
 
-    class ImageGridDiff:DiffUtil.ItemCallback<ImageResult>(){
+    class ImageGridDiff : DiffUtil.ItemCallback<ImageResult>() {
         override fun areItemsTheSame(oldItem: ImageResult, newItem: ImageResult): Boolean {
-            return oldItem==newItem
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(oldItem: ImageResult, newItem: ImageResult): Boolean {
-            return oldItem==newItem
+            return oldItem == newItem
         }
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int)=
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         ImageGridViewHolder(
             ImageGridViewHolderBinding.inflate(
                 LayoutInflater.from(parent.context),
-                parent,false
+                parent, false
             )
         )
 
     override fun onBindViewHolder(holder: ImageGridViewHolder, position: Int) {
-        holder.bind(getItem(holder.adapterPosition))
+        holder.bind(getItem(holder.bindingAdapterPosition))
+
+        holder.binding.root.setOnClickListener {
+            click.invoke(
+                getItem(holder.bindingAdapterPosition), holder.bindingAdapterPosition
+            )
+        }
     }
 }

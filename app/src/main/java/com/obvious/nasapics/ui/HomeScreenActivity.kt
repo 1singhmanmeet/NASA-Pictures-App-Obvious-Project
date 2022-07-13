@@ -2,21 +2,18 @@ package com.obvious.nasapics.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
-import android.view.animation.OvershootInterpolator
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.obvious.nasapics.R
 import com.obvious.nasapics.ui.adapters.ImageGridRecyclerAdapter
+import com.obvious.nasapics.utils.Constants
 import com.obvious.nasapics.utils.State
 import dagger.hilt.android.AndroidEntryPoint
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.activity_home_screen.*
 
 @AndroidEntryPoint
@@ -28,7 +25,9 @@ class HomeScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
 
-        val imageGridAdapter=ImageGridRecyclerAdapter()
+        val imageGridAdapter=ImageGridRecyclerAdapter{ imageResult, position ->
+            showImageDetailFragment(position)
+        }
         images_recycler?.apply {
             layoutManager=
                 StaggeredGridLayoutManager(2,
@@ -39,7 +38,7 @@ class HomeScreenActivity : AppCompatActivity() {
         }
 
         swipe_refresh_layout?.setOnRefreshListener {
-            homeScreenViewModel.getImages(true)
+            homeScreenViewModel.getImages()
         }
         homeScreenViewModel.currentState.observe(this){ state ->
             when(state){
@@ -48,6 +47,19 @@ class HomeScreenActivity : AppCompatActivity() {
                 }
                 State.LOADED->{
                     swipe_refresh_layout?.isRefreshing=false
+                }
+
+                State.OFFLINE->{
+                    current_mode?.visibility= View.VISIBLE
+                    current_mode?.text=Constants.OFFLINE_MODE
+                }
+
+                State.ONLINE->{
+                    if(current_mode?.visibility==View.VISIBLE) {
+                        current_mode?.text = Constants.BACK_ONLINE
+                        Handler(Looper.getMainLooper())
+                            .postDelayed({ current_mode?.visibility = View.GONE }, 1500)
+                    }
                 }
                 else->{}
             }
@@ -68,8 +80,13 @@ class HomeScreenActivity : AppCompatActivity() {
 
     }
 
-    lateinit var detailsDialog:BottomSheetDialogFragment
-    fun createImageDetailFragment(){
+    var imageDetailsFragment: ImageDetailsFragment?=null
+    private fun showImageDetailFragment(position:Int){
+        if(imageDetailsFragment==null)
+            imageDetailsFragment= ImageDetailsFragment.newInstance()
+        imageDetailsFragment?.currentPosition=position
+        imageDetailsFragment?.show(supportFragmentManager,
+            ImageDetailsFragment.DETAILS_FRAGMENT)
 
     }
 }
