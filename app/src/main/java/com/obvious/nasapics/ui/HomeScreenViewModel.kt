@@ -46,6 +46,9 @@ class HomeScreenViewModel @Inject constructor(
             val imageList=withContext(Dispatchers.IO){
                 imageRepository.getImages(networkAvailable)
             }
+            if(imageList.isEmpty()){
+                _currentState.value=State.NO_INTERNET
+            }
             _imageList.value=imageList
             _currentState.value=State.LOADED
         }catch (e:Exception){

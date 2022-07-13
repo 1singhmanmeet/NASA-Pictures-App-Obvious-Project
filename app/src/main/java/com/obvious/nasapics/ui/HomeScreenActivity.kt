@@ -61,7 +61,9 @@ class HomeScreenActivity : AppCompatActivity() {
                             .postDelayed({ current_mode?.visibility = View.GONE }, 1500)
                     }
                 }
-                else->{}
+                else->{
+                    no_internet?.visibility=View.VISIBLE
+                }
             }
         }
 
@@ -70,8 +72,8 @@ class HomeScreenActivity : AppCompatActivity() {
         }
 
         homeScreenViewModel.imageList.observe(this){
-            Log.e("HomeActivity","List size: ${it.size}")
             if(it.isNotEmpty()){
+                no_internet?.visibility=View.GONE
                 imageGridAdapter.submitList(it)
             }
         }
